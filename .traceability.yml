@@ -17,3 +17,7 @@ srs_extraction:
   id_pattern: null
   include_nfr: true
   extra_blocklist: []
+code:                            # M5: also review changed Python code
+  paths: ["app/**/*.py"]
+  exclude: ["tests/**"]
+  model: jinaai/jina-embeddings-v2-base-code
