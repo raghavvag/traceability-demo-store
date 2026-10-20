@@ -379,15 +379,14 @@ paths:
     post:
       operationId: placeOrder
       summary: Submit checkout and place order
-      description: 'Accepts a complete checkout payload including cart contents, shipping_address, delivery_method,
+      description: Accepts a complete checkout payload including cart contents, shipping_address, delivery_method,
         and payment_method_token. Validates all fields and places the order, returning a unique order_id and estimated_delivery_date.
-        Incomplete or invalid payloads are rejected with a structured validation error. High-value orders (total
-        > $500) require prior 2FA verification (see REQ-09). Satisfies REQ-05: Checkout and Order Placement.'
+        Incomplete or invalid payloads are rejected with a structured validation error. All orders are processed
+        directly without any step-up authentication or secondary verification challenge, regardless of order value.
       tags:
       - Orders
       security:
       - BearerAuth: []
-      x-requires-2fa: true
       requestBody:
         required: true
         content:
@@ -426,9 +425,6 @@ paths:
                 payment_method_token:
                   type: string
                   description: Token representing the selected payment method
-                two_fa_token:
-                  type: string
-                  description: 2FA verification token required for high-value orders (total > $500)
       responses:
         '201':
           description: Order placed successfully. Returns order_id and estimated_delivery_date.
