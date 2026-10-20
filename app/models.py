@@ -48,7 +48,6 @@ class CheckoutRequest(BaseModel):
     shipping_address: str = Field(..., description="Validated shipping address")
     delivery_method: str = Field(..., description="Selected delivery method")
     payment_method_token: str = Field(..., description="Token of the selected payment method")
-    two_fa_token: Optional[str] = Field(None, description="2FA token, required for orders over $500")
 
 
 class Order(BaseModel):
