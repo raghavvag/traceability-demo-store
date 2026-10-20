@@ -31,14 +31,13 @@ class Cart(BaseModel):
 
 class RefundRequest(BaseModel):
     order_id: str = Field(..., description="The order to refund")
-    transaction_id: str = Field(..., description="Unique client-provided id for idempotent processing and audit")
     refund_amount: float = Field(..., description="Amount to refund")
     reason: str = Field(..., description="Reason for the refund")
 
 
 class RefundReceipt(BaseModel):
     refund_id: str
-    transaction_id: str = Field(..., description="Echo of the client transaction_id for the audit trail")
+    refund_reference: str = Field(..., description="Server-generated reference for internal tracking")
     order_id: str
     refund_amount: float
     status: str
