@@ -22,16 +22,9 @@ class Challenge(BaseModel):
     expires_in: int = Field(..., description="Seconds until the OTP expires")
 
 
-def requires_step_up(operation: str, amount: float) -> bool:
-    """Two-factor authentication (2FA) is required for orders over $500 and for adding a new payment method."""
-    return operation == "add_payment_method" or amount > HIGH_VALUE_LIMIT
-
-
 @router.post("/challenge", response_model=Challenge)
 def issue_challenge(req: ChallengeRequest, user_id: str) -> Challenge:
     """Issue a time-limited one-time password (OTP) challenge for a high-value operation that needs 2FA."""
-    if not requires_step_up(req.operation, req.amount):
-        raise HTTPException(status_code=400, detail="This operation does not need two-factor verification")
     token, ttl = otp_store.send_otp(user_id, req.operation)
     return Challenge(challenge_token=token, expires_in=ttl)
 
