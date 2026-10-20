@@ -311,12 +311,10 @@ paths:
   /api/v1/refund:
     post:
       operationId: processRefund
-      summary: Process a refund transaction with idempotent transaction_id
-      description: 'Initiates a refund for a completed order. The client MUST provide a unique transaction_id in
-        the request body to ensure idempotent processing — duplicate requests with the same transaction_id will
-        return the original refund receipt rather than creating a duplicate refund. The transaction_id is included
-        in the refund receipt response for end-to-end financial audit trail compliance. Satisfies REQ-04: Refund
-        Transaction Integrity.'
+      summary: Process a refund and obtain a server-generated refund confirmation
+      description: Initiates a refund for a completed order. Submits order_id, refund_amount and reason. The server
+        auto-generates a unique refund_reference for internal tracking and returns it in the response. No caller-supplied
+        idempotency key is accepted or required.
       tags:
       - Payments
       security:
@@ -329,17 +327,12 @@ paths:
               type: object
               required:
               - order_id
-              - transaction_id
               - refund_amount
               - reason
               properties:
                 order_id:
                   type: string
                   description: The order to refund
-                transaction_id:
-                  type: string
-                  description: Unique client-provided identifier for idempotent processing and financial audit compliance.
-                    Must be unique per refund attempt.
                 refund_amount:
                   type: number
                   description: Amount to refund in the order's currency
@@ -353,8 +346,7 @@ paths:
                   description: Reason for the refund
       responses:
         '200':
-          description: Refund processed successfully. Returns the refund receipt including the client-provided transaction_id,
-            confirming end-to-end audit traceability.
+          description: Refund processed successfully. Returns a server-generated refund_reference code.
           content:
             application/json:
               schema:
@@ -362,9 +354,9 @@ paths:
                 properties:
                   refund_id:
                     type: string
-                  transaction_id:
+                  refund_reference:
                     type: string
-                    description: Echo of the client-provided transaction_id for audit trail verification
+                    description: Auto-generated server-side reference code for this refund
                   order_id:
                     type: string
                   refund_amount:
