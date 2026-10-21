@@ -308,6 +308,61 @@ paths:
       responses:
         '200':
           description: Item removed. Returns updated cart state with the item removed and the subtotal recomputed.
+  /api/v1/cart/discount:
+    post:
+      operationId: applyDiscountCode
+      summary: Apply a promotional discount code to the shopping cart
+      description: Applies a promotional discount_code to the authenticated user's persistent shopping cart. Returns
+        the updated cart state with item_id, product_id, quantity, unit_price, the discount_amount applied and the
+        recalculated subtotal. Invalid or expired codes are rejected with a structured validation error.
+      tags:
+      - Cart
+      security:
+      - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - discount_code
+              properties:
+                discount_code:
+                  type: string
+                  description: Promotional discount code entered by the shopper
+      responses:
+        '200':
+          description: Discount applied. Returns the cart with the discount and recalculated subtotal.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cart_id:
+                    type: string
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        item_id:
+                          type: string
+                        product_id:
+                          type: string
+                        quantity:
+                          type: integer
+                        unit_price:
+                          type: number
+                  discount_code:
+                    type: string
+                  discount_amount:
+                    type: number
+                  subtotal:
+                    type: number
+                    description: Server-computed subtotal after the discount
+        '422':
+          description: Invalid or expired discount code.
   /api/v1/refund:
     post:
       operationId: processRefund
